@@ -64,5 +64,10 @@ void renderCalendar(int y, int m) {
 }
 
 void main() {
-    renderCalendar(2023, 1);
+    int y,m;
+    printf("Please enter year:");
+    scanf("%d",&y);
+    printf("Please enter month:");
+    scanf("%d",&m);
+    renderCalendar(y, m);
 }
