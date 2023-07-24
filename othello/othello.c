@@ -1,18 +1,21 @@
 #include <string.h>
-#include "stdio.h"
+#include <stdio.h>
 #include <conio.h>
 #include <synchapi.h>
 #include <stdbool.h>
 #include <time.h>
 
+//盤面の大きさ 可変だが,main関数内の配列の初期値を変更する必要がある
 #define BOARD_SIZE 8
 #define SIZE BOARD_SIZE + 2
+//ボード用
 #define EDGE -1
 #define EMPTY 0
 #define BLACK 1
 #define WHITE 2
 #define SELECTED 3
 #define PLACEABLE 4
+//キーバインド
 #define TOP 'w'
 #define BOTTOM 's'
 #define LEFT 'a'
