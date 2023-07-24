@@ -23,14 +23,14 @@ typedef struct{
     char y;
 } vec2c;
 
-vec2c initVec2c(char x,char y){
+vec2c init_vec2c(char x, char y){
     vec2c tmp;
     tmp.x = x;
     tmp.y = y;
     return tmp;
 }
 
-int checkLine(char board[SIZE][SIZE],int color,int enemyColor,vec2c coordinate,vec2c vec){
+int check_line(char board[SIZE][SIZE], int color, int enemyColor, vec2c coordinate, vec2c vec){
     int count = 0;
     while(1){
         coordinate.x += vec.x;
@@ -44,7 +44,7 @@ int checkLine(char board[SIZE][SIZE],int color,int enemyColor,vec2c coordinate,v
         }
     }
 }
-char getPlaceable(char board[SIZE][SIZE],int color,char cells[SIZE][SIZE]){
+char get_placeable(char board[SIZE][SIZE], int color, char cells[SIZE][SIZE]){
     int enemyColor = (color == BLACK)?WHITE:BLACK;
     char count = 0;
     for(int i = 1;i<SIZE-1;i++){
@@ -52,23 +52,23 @@ char getPlaceable(char board[SIZE][SIZE],int color,char cells[SIZE][SIZE]){
             cells[i][j] = 0;
             if(board[i][j] == EMPTY){
                 int t,tr,r,br,b,bl,l,tl = 0;
-                vec2c coordinate = initVec2c(j,i);
+                vec2c coordinate = init_vec2c(j, i);
                 //上
-                t = checkLine(board, color, enemyColor, coordinate, initVec2c(0,-1));
+                t = check_line(board, color, enemyColor, coordinate, init_vec2c(0, -1));
                 //右上
-                tr = checkLine(board, color, enemyColor, coordinate, initVec2c(1,-1));
+                tr = check_line(board, color, enemyColor, coordinate, init_vec2c(1, -1));
                 //右
-                r = checkLine(board, color, enemyColor, coordinate, initVec2c(1,0));
+                r = check_line(board, color, enemyColor, coordinate, init_vec2c(1, 0));
                 //右下
-                br = checkLine(board, color, enemyColor, coordinate, initVec2c(1,1));
+                br = check_line(board, color, enemyColor, coordinate, init_vec2c(1, 1));
                 //下
-                b = checkLine(board, color, enemyColor, coordinate, initVec2c(0,1));
+                b = check_line(board, color, enemyColor, coordinate, init_vec2c(0, 1));
                 //左下
-                bl = checkLine(board, color, enemyColor, coordinate, initVec2c(-1,1));
+                bl = check_line(board, color, enemyColor, coordinate, init_vec2c(-1, 1));
                 //左
-                l = checkLine(board, color, enemyColor, coordinate, initVec2c(-1,0));
+                l = check_line(board, color, enemyColor, coordinate, init_vec2c(-1, 0));
                 //左上
-                tl = checkLine(board, color, enemyColor, coordinate, initVec2c(-1,-1));
+                tl = check_line(board, color, enemyColor, coordinate, init_vec2c(-1, -1));
                 if(t||tr||r||br||b||bl||l||tl){
                     cells[i][j] = 1;
                     count++;
@@ -79,7 +79,7 @@ char getPlaceable(char board[SIZE][SIZE],int color,char cells[SIZE][SIZE]){
     return count;
 }
 
-void countCells(char board[SIZE][SIZE],int* black,int* white){
+void count_cells(char board[SIZE][SIZE], int* black, int* white){
     *black = 0;
     *white = 0;
     for(int i = 1;i<SIZE-1;i++){
@@ -93,7 +93,7 @@ void countCells(char board[SIZE][SIZE],int* black,int* white){
     }
 }
 
-void renderBoard(char board[SIZE][SIZE],char* message){
+void render_board(char board[SIZE][SIZE], char* message){
     printf("\033[20F");
     printf("\x1b[48;5;22m");
     printf("+");
@@ -162,21 +162,21 @@ char place(char board[SIZE][SIZE], vec2c dst, int color){
 
     int t,tr,r,br,b,bl,l,tl = 0;
     //上
-    t = checkLine(board, color, enemyColor, dst, initVec2c(0,-1));
+    t = check_line(board, color, enemyColor, dst, init_vec2c(0, -1));
     //右上
-    tr = checkLine(board, color, enemyColor, dst, initVec2c(1,-1));
+    tr = check_line(board, color, enemyColor, dst, init_vec2c(1, -1));
     //右
-    r = checkLine(board, color, enemyColor, dst, initVec2c(1,0));
+    r = check_line(board, color, enemyColor, dst, init_vec2c(1, 0));
     //右下
-    br = checkLine(board, color, enemyColor, dst, initVec2c(1,1));
+    br = check_line(board, color, enemyColor, dst, init_vec2c(1, 1));
     //下
-    b = checkLine(board, color, enemyColor, dst, initVec2c(0,1));
+    b = check_line(board, color, enemyColor, dst, init_vec2c(0, 1));
     //左下
-    bl = checkLine(board, color, enemyColor, dst, initVec2c(-1,1));
+    bl = check_line(board, color, enemyColor, dst, init_vec2c(-1, 1));
     //左
-    l = checkLine(board, color, enemyColor, dst, initVec2c(-1,0));
+    l = check_line(board, color, enemyColor, dst, init_vec2c(-1, 0));
     //左上
-    tl = checkLine(board, color, enemyColor, dst, initVec2c(-1,-1));
+    tl = check_line(board, color, enemyColor, dst, init_vec2c(-1, -1));
 
     int count = 0;
     while(1){
@@ -202,7 +202,7 @@ char place(char board[SIZE][SIZE], vec2c dst, int color){
     return count;
 }
 
-char* getColorName(int color){
+char* get_color_display_name(int color){
     switch(color){
         case BLACK:
             return "黒";
@@ -211,7 +211,7 @@ char* getColorName(int color){
     }
 }
 
-char* getPlayerName(char plr){
+char* get_player_display_name(char plr){
     switch(plr){
         case 0:
             return "PLAYER";
@@ -224,7 +224,7 @@ char* getPlayerName(char plr){
     }
 }
 
-vec2c intelligentComputerLv1(char board[SIZE][SIZE],char placeable[SIZE][SIZE],char num,int color){
+vec2c intelligent_computer_lv1(char board[SIZE][SIZE], char placeable[SIZE][SIZE], char num, int color){
     char idx;
     vec2c dst[num];
     char dstCount = 0;
@@ -234,7 +234,7 @@ vec2c intelligentComputerLv1(char board[SIZE][SIZE],char placeable[SIZE][SIZE],c
             if(placeable[i][j]){
                 char tmp[SIZE][SIZE]={0};
                 memcpy(tmp, board, 100);
-                char changed_tmp = place(tmp, initVec2c(j,i), color);
+                char changed_tmp = place(tmp, init_vec2c(j, i), color);
                 if(i==1||i==SIZE-2){
                     changed_tmp *= 2;
                     if(j==1||j==SIZE-2){
@@ -251,9 +251,9 @@ vec2c intelligentComputerLv1(char board[SIZE][SIZE],char placeable[SIZE][SIZE],c
                 if(changed_tmp>maxChanged){
                     maxChanged = changed_tmp;
                     dstCount = 1;
-                    dst[0] = initVec2c(j,i);
+                    dst[0] = init_vec2c(j, i);
                 }else if(changed_tmp==maxChanged){
-                    dst[dstCount] = initVec2c(j,i);
+                    dst[dstCount] = init_vec2c(j, i);
                     dstCount++;
                 }
             }
@@ -263,7 +263,7 @@ vec2c intelligentComputerLv1(char board[SIZE][SIZE],char placeable[SIZE][SIZE],c
     return dst[idx];
 }
 
-vec2c intelligentComputerLv2(char board[SIZE][SIZE],char placeable[SIZE][SIZE],char num,int color){
+vec2c intelligent_computer_lv2(char board[SIZE][SIZE], char placeable[SIZE][SIZE], char num, int color){
     int enemyColor = (color == BLACK)?WHITE:BLACK;
     char idx;
     vec2c dst[num];
@@ -274,7 +274,7 @@ vec2c intelligentComputerLv2(char board[SIZE][SIZE],char placeable[SIZE][SIZE],c
             if(placeable[i][j]){
                 char tmp[SIZE][SIZE]={0};
                 memcpy(tmp, board, 100);
-                char changed_tmp = place(tmp, initVec2c(j,i), color);
+                char changed_tmp = place(tmp, init_vec2c(j, i), color);
                 if(i==1||i==SIZE-2){
                     changed_tmp *= 2;
                     if(j==1||j==SIZE-2){
@@ -293,20 +293,20 @@ vec2c intelligentComputerLv2(char board[SIZE][SIZE],char placeable[SIZE][SIZE],c
 
                 bool enemy_can_place_corner = false;
 
-                if(getPlaceable(tmp,enemyColor,tmp_placeable)>0){
+                if(get_placeable(tmp, enemyColor, tmp_placeable) > 0){
                     enemy_can_place_corner = tmp_placeable[1][1]==1||tmp_placeable[1][SIZE-2]==1||tmp_placeable[SIZE-2][1]==1||tmp_placeable[SIZE-2][SIZE-2]==1;
 
-                    vec2c dst = intelligentComputerLv1(tmp, tmp_placeable, num,enemyColor);
+                    vec2c dst = intelligent_computer_lv1(tmp, tmp_placeable, num, enemyColor);
                     place(tmp, dst, enemyColor);
                 }
-                if(getPlaceable(tmp,color,tmp_placeable)>0){
+                if(get_placeable(tmp, color, tmp_placeable) > 0){
                     char maxChanged2 = 0;
                     char tmp2[SIZE][SIZE] = {0};
                     for(char i2 = 1;i2<SIZE-1;i2++) {
                         for (char j2 = 1; j2 < SIZE - 1; j2++) {
                             if (placeable[i2][j2]) {
                                 memcpy(tmp2, tmp, 100);
-                                char changed_tmp2 = place(tmp2, initVec2c(j2, i2), color);
+                                char changed_tmp2 = place(tmp2, init_vec2c(j2, i2), color);
                                 if (i2 == 1 || i2 == SIZE - 2) {
                                     changed_tmp2 *= 2;
                                     if (j2 == 1 || j2 == SIZE - 2) {
@@ -332,9 +332,9 @@ vec2c intelligentComputerLv2(char board[SIZE][SIZE],char placeable[SIZE][SIZE],c
                 if(changed_tmp>maxChanged){
                     maxChanged = changed_tmp;
                     dstCount = 1;
-                    dst[0] = initVec2c(j,i);
+                    dst[0] = init_vec2c(j, i);
                 }else if(changed_tmp==maxChanged){
-                    dst[dstCount] = initVec2c(j,i);
+                    dst[dstCount] = init_vec2c(j, i);
                     dstCount++;
                 }
             }
@@ -344,14 +344,14 @@ vec2c intelligentComputerLv2(char board[SIZE][SIZE],char placeable[SIZE][SIZE],c
     return dst[idx];
 }
 
-vec2c randomComputer(char board[SIZE][SIZE],char placeable[SIZE][SIZE],char num, int color){
+vec2c random_computer(char board[SIZE][SIZE], char placeable[SIZE][SIZE], char num, int color){
     char idx = rand()%num;
     char count = 0;
     for(char i = 1;i<SIZE-1;i++){
         for(char j = 1;j<SIZE-1;j++){
             if(placeable[i][j]){
                 if(count == idx){
-                    return initVec2c(j,i);
+                    return init_vec2c(j, i);
                 }
                 count++;
             }
@@ -359,13 +359,13 @@ vec2c randomComputer(char board[SIZE][SIZE],char placeable[SIZE][SIZE],char num,
     }
 }
 
-int computerTurn(char board[SIZE][SIZE], int color,int level){
+int turn_computer(char board[SIZE][SIZE], int color, int level){
     char placeable[SIZE][SIZE] = {0};
-    char num = getPlaceable(board, color, placeable);
+    char num = get_placeable(board, color, placeable);
     if(num == 0)return 2;
 
     char message[30];
-    sprintf(message,"ターン: %s(%s)", getColorName(color), getPlayerName(level+1));
+    sprintf(message, "ターン: %s(%s)", get_color_display_name(color), get_player_display_name(level + 1));
 
     char tmp[SIZE][SIZE]={0};
     memcpy(tmp, board, 100);
@@ -373,13 +373,13 @@ int computerTurn(char board[SIZE][SIZE], int color,int level){
     vec2c dst;
     switch(level){
         case 0:
-            dst = randomComputer(board, placeable, num, color);
+            dst = random_computer(board, placeable, num, color);
             break;
         case 1:
-            dst = intelligentComputerLv1(board, placeable, num, color);
+            dst = intelligent_computer_lv1(board, placeable, num, color);
             break;
         case 2:
-            dst = intelligentComputerLv2(board, placeable, num, color);
+            dst = intelligent_computer_lv2(board, placeable, num, color);
             break;
     }
     //_getch()==0x0d;
@@ -387,18 +387,18 @@ int computerTurn(char board[SIZE][SIZE], int color,int level){
     //Sleep(50);
 
     place(board, dst, color);
-    renderBoard(board,message);
+    render_board(board, message);
     return 1;
 }
 
-int playerTurn(char board[SIZE][SIZE],int color){
+int turn_player(char board[SIZE][SIZE], int color){
     char placeable[SIZE][SIZE] = {0};
-    int count = getPlaceable(board, color, placeable);
+    int count = get_placeable(board, color, placeable);
     if(count==0)return 2;
 
-    printf("プレイヤー(%s)のターン\n",getColorName(color));
+    printf("プレイヤー(%s)のターン\n", get_color_display_name(color));
 
-    vec2c pos = initVec2c(5,5);
+    vec2c pos = init_vec2c(5, 5);
     char* message = "";
     while(1){
         message = "";
@@ -420,7 +420,7 @@ int playerTurn(char board[SIZE][SIZE],int color){
             case 0x0d:
                 if(placeable[pos.y][pos.x]){
                     place(board,pos,color);
-                    renderBoard(board,"");
+                    render_board(board, "");
                     return 1;
                 }else{
                     message = "そこには置けません。";
@@ -436,10 +436,22 @@ int playerTurn(char board[SIZE][SIZE],int color){
         tmp[pos.y][pos.x] = SELECTED;
         if(color==BLACK)message="ターン: 黒(YOU)        ";
         else message="ターン: 白(YOU)        ";
-        renderBoard(tmp,message);
+        render_board(tmp, message);
     }
 }
-char setPlayer(char idx){
+
+int turn(char board[SIZE][SIZE],int color,int type){
+    switch (type) {
+        case 0:
+            return turn_player(board, color);
+        case 1:
+        case 2:
+        case 3:
+            return turn_computer(board, color, type - 1);
+    }
+}
+
+char set_player(char idx){
     printf("プレイヤー%dを設定してください。\n",idx);
 
     char selected = 0;
@@ -467,21 +479,10 @@ char setPlayer(char idx){
     }
 }
 
-int turn(char board[SIZE][SIZE],int color,int type){
-    switch (type) {
-        case 0:
-            return playerTurn(board,color);
-        case 1:
-        case 2:
-        case 3:
-            return computerTurn(board,color,type-1);
-    }
-}
-
 void setting(int* plr1,int* plr2){
     printf("---ゲーム設定---\n");
-    *plr1 = setPlayer(1);
-    *plr2 = setPlayer(2);
+    *plr1 = set_player(1);
+    *plr2 = set_player(2);
 }
 
 void main(){
@@ -500,12 +501,12 @@ void main(){
         {EDGE,EMPTY,EMPTY,EMPTY,EMPTY,EMPTY,EMPTY,EMPTY,EMPTY,EDGE},
         {EDGE,EDGE,EDGE,EDGE,EDGE,EDGE,EDGE,EDGE,EDGE,EDGE}
     };
-    renderBoard(board,"");
+    render_board(board, "");
     int flag = 1;
     int count = 0;
     int black,white = 0;
     bool skipFlag=false;
-    countCells(board,&black,&white);
+    count_cells(board, &black, &white);
     board[0][0] = EDGE-black;
     board[0][SIZE-1] = EDGE-white;
     srand( (int)time(NULL) );
@@ -522,7 +523,8 @@ void main(){
                 break;
             }
             char plr = (board[0][0]-EDGE)*-1<(board[0][SIZE-1]-EDGE)*-1?plr1:plr2;
-            printf("%s(%s)の勝利!              \n", getPlayerName(plr), getColorName((board[0][0]-EDGE)*-1<(board[0][SIZE-1]-EDGE)*-1?WHITE:BLACK));
+            printf("%s(%s)の勝利!              \n", get_player_display_name(plr),
+                   get_color_display_name((board[0][0] - EDGE) * -1 < (board[0][SIZE - 1] - EDGE) * -1 ? WHITE : BLACK));
             break;
         }
         skipFlag = flag==2;
