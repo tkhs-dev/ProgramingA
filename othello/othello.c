@@ -631,7 +631,7 @@ void main() {
         } else {
             flag = turn(board, count % 2 ? WHITE : BLACK, plr2);
         }
-        if(flag==2) printf("passed!");
+        if (flag == 2) printf("passed!");
 
         /**
          * ゲームの結果を判定する
