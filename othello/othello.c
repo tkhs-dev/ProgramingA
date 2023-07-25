@@ -472,7 +472,7 @@ int turn_computer(char board[SIZE][SIZE], int color, int level) {
     }
     //_getch()==0x0d;
     //_getch();
-    //Sleep(50);
+    Sleep(500);
 
     place(board, dst, color); //決定された位置にコマを設置する
     render_board(board, message); //結果を描画
@@ -631,6 +631,7 @@ void main() {
         } else {
             flag = turn(board, count % 2 ? WHITE : BLACK, plr2);
         }
+        if(flag==2) printf("passed!");
 
         /**
          * ゲームの結果を判定する
