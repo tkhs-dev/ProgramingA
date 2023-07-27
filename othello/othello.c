@@ -103,26 +103,6 @@ int get_placeable(int board[SIZE][SIZE], int color, int cells[SIZE][SIZE]) {
 }
 
 /**
- * @brief コマの数を数える
- * @param board
- * @param black 黒の結果を返すポインタ
- * @param white 白の結果を返すポインタ
- */
-void count_cells(int board[SIZE][SIZE], int *black, int *white) {
-    *black = 0;
-    *white = 0;
-    for (int i = 1; i < SIZE - 1; i++) {
-        for (int j = 1; j < SIZE - 1; j++) {
-            if (board[i][j] == BLACK) {
-                *black += 1;
-            } else if (board[i][j] == WHITE) {
-                *white += 1;
-            }
-        }
-    }
-}
-
-/**
  * @brief ボードを描画する
  * @param board
  */
@@ -661,12 +641,10 @@ void main() {
     render_board(board, ""); //盤面を描画
     int flag = 1; //ターンの結果を判定するフラグ
     int count = 0; //ターン数を数える変数
-    int black, white = 0; //初期の駒の数を数え上げる変数
     bool skipFlag = false; //パスをしたかどうかを判定するフラグ
-    count_cells(board, &black, &white); //初期の駒を数え上げる
     //ボードの上部の２つの隅に,コマ数の情報を保存する
-    board[0][0] = EDGE - black;
-    board[0][SIZE - 1] = EDGE - white;
+    board[0][0] = EDGE - 2;
+    board[0][SIZE - 1] = EDGE - 2;
     srand((int) time(NULL)); //乱数の初期化
     while (flag) { //ゲームのメインループ
         if (count % 2) { //ターンを実行
