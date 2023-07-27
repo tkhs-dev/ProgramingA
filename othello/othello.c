@@ -594,7 +594,7 @@ char set_player(char idx) {
  * @param plr2 設定されたプレイヤー２のプレイヤータイプ
  */
 void setting(int *plr1, int *plr2) {
-    printf("---ゲーム設定---\n");
+    printf("---ゲーム設定(WASD操作)---\n");
     *plr1 = set_player(1);
     *plr2 = set_player(2);
 }
