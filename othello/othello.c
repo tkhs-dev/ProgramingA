@@ -18,7 +18,7 @@
 #define LEFT 'a'
 #define RIGHT 'd'
 
-//盤面の大きさ 可変だが,main関数内の配列の初期値を変更する必要がある
+//盤面用グローバル変数
 int BOARD_SIZE  = 8;
 int SIZE = 10;
 
@@ -28,6 +28,7 @@ typedef struct {
     char y;
 } vec2c;
 
+//vec2cコンストラクタ
 vec2c init_vec2c(char x, char y) {
     vec2c tmp;
     tmp.x = x;
@@ -455,8 +456,6 @@ int turn_computer(int board[SIZE][SIZE], int color, int level) {
             dst = intelligent_computer_lv2(board, placeable, num, color);
             break;
     }
-    //_getch()==0x0d;
-    //_getch();
     Sleep(500);
 
     place(board, dst, color); //決定された位置にコマを設置する
@@ -619,9 +618,9 @@ void main() {
 
     int board[SIZE][SIZE];
 
+    //盤面の初期化
     for(int i = 0; i < SIZE; i++){
         for(int j = 0; j < SIZE; j++){
-            //もし四辺ならEDGEを代入
             if(i == 0 || i == SIZE - 1 || j == 0 || j == SIZE - 1) {
                 board[i][j] = EDGE;
             } else if(i == SIZE / 2 - 1 && j == SIZE / 2 - 1) {
