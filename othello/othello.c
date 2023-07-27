@@ -5,9 +5,6 @@
 #include <stdbool.h>
 #include <time.h>
 
-//盤面の大きさ 可変だが,main関数内の配列の初期値を変更する必要がある
-#define BOARD_SIZE 8
-#define SIZE BOARD_SIZE + 2
 //ボード用
 #define EDGE -1
 #define EMPTY 0
@@ -20,6 +17,10 @@
 #define BOTTOM 's'
 #define LEFT 'a'
 #define RIGHT 'd'
+
+//盤面の大きさ 可変だが,main関数内の配列の初期値を変更する必要がある
+int BOARD_SIZE  = 8;
+int SIZE = 10;
 
 //座標を扱う構造体
 typedef struct {
@@ -43,7 +44,7 @@ vec2c init_vec2c(char x, char y) {
  * @param vec 方向を指定するベクトル
  * @return ひっくり返すことができるコマの数
  */
-int check_line(char board[10][10], int color, vec2c coordinate, vec2c vec) {
+int check_line(int board[SIZE][SIZE], int color, vec2c coordinate, vec2c vec) {
     int enemy_color = (color == BLACK) ? WHITE : BLACK;
     int count = 0;
     while (1) {
@@ -66,9 +67,9 @@ int check_line(char board[10][10], int color, vec2c coordinate, vec2c vec) {
  * @param cells 設置可能な位置にフラグが立った結果を返す用の配列
  * @return 設置可能な位置の数
  */
-char get_placeable(char board[SIZE][SIZE], int color, char cells[SIZE][SIZE]) {
+int get_placeable(int board[SIZE][SIZE], int color, int cells[SIZE][SIZE]) {
     int enemyColor = (color == BLACK) ? WHITE : BLACK;
-    char count = 0;
+    int count = 0;
     for (int i = 1; i < SIZE - 1; i++) {
         for (int j = 1; j < SIZE - 1; j++) {
             cells[i][j] = 0;
@@ -107,7 +108,7 @@ char get_placeable(char board[SIZE][SIZE], int color, char cells[SIZE][SIZE]) {
  * @param black 黒の結果を返すポインタ
  * @param white 白の結果を返すポインタ
  */
-void count_cells(char board[SIZE][SIZE], int *black, int *white) {
+void count_cells(int board[SIZE][SIZE], int *black, int *white) {
     *black = 0;
     *white = 0;
     for (int i = 1; i < SIZE - 1; i++) {
@@ -125,8 +126,8 @@ void count_cells(char board[SIZE][SIZE], int *black, int *white) {
  * @brief ボードを描画する
  * @param board
  */
-void render_board(char board[SIZE][SIZE], char *message) {
-    printf("\033[20F");
+void render_board(int board[SIZE][SIZE], char *message) {
+    printf("\033[%dF",BOARD_SIZE*4+2);
     printf("\x1b[48;5;22m");
     printf("+");
     for (int i = 1; i < SIZE - 1; i++) {
@@ -180,7 +181,10 @@ void render_board(char board[SIZE][SIZE], char *message) {
         }
         printf("\n");
         printf("\x1b[48;5;22m");
-        printf("+ - + - + - + - + - + - + - + - +");
+        printf("+");
+        for (int i = 1; i < SIZE - 1; i++) {
+            printf(" - +");
+        }
         printf("\x1b[0m");
         printf("\n");
     }
@@ -195,7 +199,7 @@ void render_board(char board[SIZE][SIZE], char *message) {
  * @param color
  * @return ひっくり返ったコマの数
  */
-char place(char board[SIZE][SIZE], vec2c dst, int color) {
+int place(int board[SIZE][SIZE], vec2c dst, int color) {
     int enemyColor = (color == BLACK) ? WHITE : BLACK;
     board[dst.y][dst.x] = color;
 
@@ -283,17 +287,17 @@ char *get_player_display_name(char plr) {
  * @return 決定した座標
  * @details 一番多くひっくり返せる場所に置く.ただし四辺と隅は優先して置く.
  */
-vec2c intelligent_computer_lv1(char board[SIZE][SIZE], char placeable[SIZE][SIZE], char num, int color) {
-    char idx;
+vec2c intelligent_computer_lv1(int board[SIZE][SIZE], int placeable[SIZE][SIZE], int num, int color) {
+    int idx;
     vec2c dst[num];
-    char dstCount = 0;
-    char maxChanged = 0;
+    int dstCount = 0;
+    int maxChanged = 0;
     for (char i = 1; i < SIZE - 1; i++) {
         for (char j = 1; j < SIZE - 1; j++) { //すべてのマスについて処理を行う
             if (placeable[i][j]) {//設置可能ならば
-                char tmp[SIZE][SIZE] = {0};
-                memcpy(tmp, board, 100); //ボード配列を退避させる
-                char changed_tmp = place(tmp, init_vec2c(j, i), color); //設置した結果をシミュレートする
+                int tmp[SIZE][SIZE];
+                memcpy(tmp, board, SIZE*SIZE*4); //ボード配列を退避させる
+                int changed_tmp = place(tmp, init_vec2c(j, i), color); //設置した結果をシミュレートする
                 if (i == 1 || i == SIZE - 2) {//四辺の場合,ひっくり返せる駒を二倍として計算
                     changed_tmp *= 2;
                     if (j == 1 || j == SIZE - 2) {//隅の場合,さらに二倍として計算
@@ -333,35 +337,35 @@ vec2c intelligent_computer_lv1(char board[SIZE][SIZE], char placeable[SIZE][SIZE
  * @return 決定した座標
  * @details 一手先まで読んで,係数をかけつつ一番多くひっくり返せる場所に置く.ただし四辺と隅は優先して置く.相手に角をとられてしまう手は避ける.
  */
-vec2c intelligent_computer_lv2(char board[SIZE][SIZE], char placeable[SIZE][SIZE], char num, int color) {
+vec2c intelligent_computer_lv2(int board[SIZE][SIZE], int placeable[SIZE][SIZE], int num, int color) {
     int enemyColor = (color == BLACK) ? WHITE : BLACK;
-    char idx;
+    int idx;
     vec2c dst[num];
-    char dstCount = 0;
-    char maxChanged = 0;
+    int dstCount = 0;
+    int maxChanged = 0;
     for (char i = 1; i < SIZE - 1; i++) {
         for (char j = 1; j < SIZE - 1; j++) {
             if (placeable[i][j]) {
-                char tmp[SIZE][SIZE] = {0};
-                memcpy(tmp, board, 100);
-                char changed_tmp = place(tmp, init_vec2c(j, i), color);
+                int tmp[SIZE][SIZE];
+                memcpy(tmp, board, SIZE*SIZE*4);
+                int changed_tmp = place(tmp, init_vec2c(j, i), color);
                 if (i == 1 || i == SIZE - 2) {
                     changed_tmp *= 2;
                     if (j == 1 || j == SIZE - 2) {
-                        changed_tmp *= 2;
+                        changed_tmp *= 5;
                     }
                 }
                 if (j == 1 || j == SIZE - 2) {
                     changed_tmp *= 2;
                     if (i == 1 || i == SIZE - 2) {
-                        changed_tmp *= 2;
+                        changed_tmp *= 5;
                     }
                 }
                 //ここまではLv1と同様
 
                 //設置可能位置配列を退避
-                char tmp_placeable[SIZE][SIZE] = {0};
-                memcpy(tmp_placeable, placeable, 100);
+                int tmp_placeable[SIZE][SIZE];
+                memcpy(tmp_placeable, placeable, SIZE*SIZE*4);
 
                 bool enemy_can_place_corner = false;//敵が四隅をとれるか保存するフラグ
 
@@ -376,13 +380,13 @@ vec2c intelligent_computer_lv2(char board[SIZE][SIZE], char placeable[SIZE][SIZE
                 }
                 //一手先を読む
                 if (get_placeable(tmp, color, tmp_placeable) > 0) {
-                    char maxChanged2 = 0;
-                    char tmp2[SIZE][SIZE] = {0};
+                    int maxChanged2 = 0;
+                    int tmp2[SIZE][SIZE];
                     for (char i2 = 1; i2 < SIZE - 1; i2++) {
                         for (char j2 = 1; j2 < SIZE - 1; j2++) {
                             if (placeable[i2][j2]) {
-                                memcpy(tmp2, tmp, 100);
-                                char changed_tmp2 = place(tmp2, init_vec2c(j2, i2), color);
+                                memcpy(tmp2, tmp, SIZE*SIZE*4);
+                                int changed_tmp2 = place(tmp2, init_vec2c(j2, i2), color);
                                 if (i2 == 1 || i2 == SIZE - 2) {
                                     changed_tmp2 *= 2;
                                     if (j2 == 1 || j2 == SIZE - 2) {
@@ -428,9 +432,9 @@ vec2c intelligent_computer_lv2(char board[SIZE][SIZE], char placeable[SIZE][SIZE
  * @param color
  * @return 決定した座標
  */
-vec2c random_computer(char board[SIZE][SIZE], char placeable[SIZE][SIZE], char num, int color) {
-    char idx = rand() % num;
-    char count = 0;
+vec2c random_computer(int board[SIZE][SIZE], int placeable[SIZE][SIZE], int num, int color) {
+    int idx = rand() % num;
+    int count = 0;
     for (char i = 1; i < SIZE - 1; i++) {
         for (char j = 1; j < SIZE - 1; j++) {
             if (placeable[i][j]) {
@@ -450,9 +454,10 @@ vec2c random_computer(char board[SIZE][SIZE], char placeable[SIZE][SIZE], char n
  * @param level
  * @return 1:成功,2:パス
  */
-int turn_computer(char board[SIZE][SIZE], int color, int level) {
-    char placeable[SIZE][SIZE] = {0};
-    char num = get_placeable(board, color, placeable);
+int turn_computer(int board[SIZE][SIZE], int color, int level) {
+    int placeable[SIZE][SIZE];
+    memset(placeable, 0, SIZE*SIZE*4);
+    int num = get_placeable(board, color, placeable);
     if (num == 0)return 2; //設置可能な場所がなければスキップ
 
     char message[30];
@@ -485,8 +490,9 @@ int turn_computer(char board[SIZE][SIZE], int color, int level) {
  * @param color
  * @return 0:中断,1:成功,2:パス
  */
-int turn_player(char board[SIZE][SIZE], int color) {
-    char placeable[SIZE][SIZE] = {0};
+int turn_player(int board[SIZE][SIZE], int color) {
+    int placeable[SIZE][SIZE];
+    memset(placeable, 0, SIZE*SIZE*4);
     int count = get_placeable(board, color, placeable);
     if (count == 0)return 2; //設置可能な場所がなければスキップ
 
@@ -525,8 +531,8 @@ int turn_player(char board[SIZE][SIZE], int color) {
             default: //それ以外のキーなら次の入力を待つ
                 goto wait;
         }
-        char tmp[SIZE][SIZE] = {0};
-        memcpy(tmp, board, 100);
+        int tmp[SIZE][SIZE];
+        memcpy(tmp, board, SIZE*SIZE*4);
         tmp[pos.y][pos.x] = SELECTED; //退避させたボードにカーソルの情報を加える
         if (color == BLACK)message = "ターン: 黒(YOU)        ";
         else message = "ターン: 白(YOU)        ";
@@ -541,7 +547,7 @@ int turn_player(char board[SIZE][SIZE], int color) {
  * @param type プレイヤータイプ
  * @return ターンの結果
  */
-int turn(char board[SIZE][SIZE], int color, int type) {
+int turn(int board[SIZE][SIZE], int color, int type) {
     switch (type) {
         case 0:
             return turn_player(board, color);
@@ -549,6 +555,29 @@ int turn(char board[SIZE][SIZE], int color, int type) {
         case 2:
         case 3:
             return turn_computer(board, color, type - 1);
+    }
+}
+
+int set_board_size(){
+    printf("盤面サイズを設定 W:増加 S:減少 ENTERで決定\n");
+    int value = 8;
+    while (1) {
+        printf("現在のサイズ: %d \n", value);
+
+        wait:
+        switch (_getch()) {
+            case BOTTOM:
+                if (value > 4)value-=2;
+                break;
+            case TOP:
+                value+=2;
+                break;
+            case 0x0d:
+                return value;
+            default:
+                goto wait; //それ以外のキーなら次の入力を待つ
+        }
+        printf("\033[1F");
     }
 }
 
@@ -593,28 +622,42 @@ char set_player(char idx) {
  * @param plr1 設定されたプレイヤー１のプレイヤータイプ
  * @param plr2 設定されたプレイヤー２のプレイヤータイプ
  */
-void setting(int *plr1, int *plr2) {
+void setting(int *board_size, int *plr1, int *plr2) {
     printf("---ゲーム設定(WASD操作)---\n");
+    *board_size = set_board_size();
     *plr1 = set_player(1);
     *plr2 = set_player(2);
 }
 
 void main() {
-    int plr1, plr2 = 0;
-    setting(&plr1, &plr2);
-    printf("\033[11F"); //描画を消す
-    char board[SIZE][SIZE] = { //盤面を8x8で初期化
-            {EDGE, EDGE,  EDGE,  EDGE,  EDGE,  EDGE,  EDGE,  EDGE,  EDGE,  EDGE},
-            {EDGE, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EDGE},
-            {EDGE, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EDGE},
-            {EDGE, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EDGE},
-            {EDGE, EMPTY, EMPTY, EMPTY, BLACK, WHITE, EMPTY, EMPTY, EMPTY, EDGE},
-            {EDGE, EMPTY, EMPTY, EMPTY, WHITE, BLACK, EMPTY, EMPTY, EMPTY, EDGE},
-            {EDGE, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EDGE},
-            {EDGE, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EDGE},
-            {EDGE, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EDGE},
-            {EDGE, EDGE,  EDGE,  EDGE,  EDGE,  EDGE,  EDGE,  EDGE,  EDGE,  EDGE}
-    };
+    int board_size, plr1, plr2 = 0;
+    setting(&board_size, &plr1, &plr2);
+    printf("\033[13F"); //描画を消す
+
+    BOARD_SIZE = board_size;
+    SIZE = board_size + 2;
+
+    int board[SIZE][SIZE];
+
+    for(int i = 0; i < SIZE; i++){
+        for(int j = 0; j < SIZE; j++){
+            //もし四辺ならEDGEを代入
+            if(i == 0 || i == SIZE - 1 || j == 0 || j == SIZE - 1) {
+                board[i][j] = EDGE;
+            } else if(i == SIZE / 2 - 1 && j == SIZE / 2 - 1) {
+                board[i][j] = WHITE;
+            } else if(i == SIZE / 2 && j == SIZE / 2) {
+                board[i][j] = WHITE;
+            } else if(i == SIZE / 2 - 1 && j == SIZE / 2) {
+                board[i][j] = BLACK;
+            } else if(i == SIZE / 2 && j == SIZE / 2 - 1) {
+                board[i][j] = BLACK;
+            } else {
+                board[i][j] = EMPTY;
+            }
+        }
+    }
+
     render_board(board, ""); //盤面を描画
     int flag = 1; //ターンの結果を判定するフラグ
     int count = 0; //ターン数を数える変数
